@@ -26,7 +26,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 
 import { createStore, combineReducers, applyMiddleware } from 'redux'
-import { Provider } from 'react-redux'
+import { Provider, connect } from 'react-redux'
 
 import createHistory from 'history/createBrowserHistory'
 import { Route } from 'react-router'
@@ -53,9 +53,8 @@ const store = createStore(
 
 // Now you can dispatch navigation actions from anywhere!
 // store.dispatch(push('/foo'))
-
-ReactDOM.render(
-  <Provider store={store}>
+const Root = () => (
+ <Provider store={store}>
     { /* ConnectedRouter will use the store from Provider automatically */ }
     <ConnectedRouter history={history}>
       <div>
@@ -64,7 +63,18 @@ ReactDOM.render(
         <Route path="/topics" component={Topics}/>
       </div>
     </ConnectedRouter>
-  </Provider>,
-  document.getElementById('root')
+  </Provider>
+)
+
+const mapStateToProps = (state, ownProps) => {
+   const { routing } = state
+   /* this will ensure changes to location.pathname will
+      register as componentWillReceiveProps */
+   return { ...ownProps, routing }
+}
+const connectedRoot = connect(mapStateToProps)(Root)
+ReactDOM.render(
+   connectedRoot,
+   document.getElementById('root')
 )
 ```
